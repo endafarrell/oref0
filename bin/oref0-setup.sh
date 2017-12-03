@@ -196,10 +196,10 @@ if [[ -z "$DIR" || -z "$serial" ]]; then
     fi
 
 
-    read -p "Are you using an Explorer Board? y/[N] " -r
+    read -p "Are you using an Explorer Board/Block? y/[N] " -r
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         ttyport=/dev/spidev5.1
-        echocolor "Ok, yay for Explorer Board! "
+        echocolor "Ok, yay for Explorer Board/Block! "
         echo
     else
         echo 'Are you using mmeowlink (i.e. with a TI stick)? If not, press enter. If so, paste your full port address: it looks like "/dev/ttySOMETHING" without the quotes.'
