@@ -152,7 +152,11 @@ def get_nightscout_carb_and_insulin_treatments(nightscout_host, start_date, end_
 
 def get_nightscout_bg_entries(nightscout_host, start_date, end_date, directory):
     logging.info('Grabbing NIGHTSCOUT enries/sgv.json for date range: {0} to {1}'.format(start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")))
-    date_list = [start_date + datetime.timedelta(days=x) for x in range(0, (end_date - start_date).days)]
+    date_list = [
+        start_date + datetime.timedelta(days=x)
+        for x in range((end_date - start_date).days)
+    ]
+
 
     for date in date_list:
         url="{0}/api/v1/entries/sgv.json?find\[date\]\[\$gte\]={1}&find\[date\]\[\$lte\]={1}`&count=1000"
@@ -163,7 +167,11 @@ def get_nightscout_bg_entries(nightscout_host, start_date, end_date, directory):
             f.write(res.text.encode('utf-8'))
 
 def run_autotune(start_date, end_date, number_of_runs, directory):
-    date_list = [start_date + datetime.timedelta(days=x) for x in range(0, (end_date - start_date).days)]
+    date_list = [
+        start_date + datetime.timedelta(days=x)
+        for x in range((end_date - start_date).days)
+    ]
+
     autotune_directory = os.path.join(directory, 'autotune')
     for run_number in range(1, number_of_runs + 1):
         for date in date_list:
@@ -171,7 +179,7 @@ def run_autotune(start_date, end_date, number_of_runs, directory):
             shutil.copy(os.path.join(autotune_directory, 'profile.json'),
                         os.path.join(autotune_directory, 'profile.{run_number}.{date}.json'
                         .format(run_number=run_number, date=date.strftime("%Y-%m-%d"))))
-        
+
             # Autotune Prep (required args, <pumphistory.json> <profile.json> <glucose.json>), output prepped glucose 
             # data or <autotune/glucose.json> below
             # oref0-autotune-prep ns-treatments.json profile.json ns-entries.$DATE.json > autotune.$RUN_NUMBER.$DATE.json
@@ -179,7 +187,7 @@ def run_autotune(start_date, end_date, number_of_runs, directory):
             profile = os.path.join(autotune_directory, 'profile.json')
             ns_entries = os.path.join(autotune_directory, 'ns-entries.{date}.json'.format(date=date.strftime("%Y-%m-%d")))
             autotune_prep = 'oref0-autotune-prep {ns_treatments} {profile} {ns_entries}'.format(ns_treatments=ns_treatments, profile=profile, ns_entries=ns_entries)
-            
+
             # autotune.$RUN_NUMBER.$DATE.json  
             autotune_run_filename = os.path.join(autotune_directory, 'autotune.{run_number}.{date}.json'
                                                  .format(run_number=run_number, date=date.strftime("%Y-%m-%d")))
@@ -187,15 +195,15 @@ def run_autotune(start_date, end_date, number_of_runs, directory):
                 logging.info('Running {script}'.format(script=autotune_prep))
                 call(autotune_prep, stdout=output, shell=True)
                 logging.info('Writing output to {filename}'.format(filename=autotune_run_filename))
-        
+
             # Autotune  (required args, <autotune/glucose.json> <autotune/autotune.json> <settings/profile.json>), 
             # output autotuned profile or what will be used as <autotune/autotune.json> in the next iteration
             # oref0-autotune-core autotune.$RUN_NUMBER.$DATE.json profile.json profile.pump.json > newprofile.$RUN_NUMBER.$DATE.json
-        
+
             # oref0-autotune-core autotune.$run_number.$i.json profile.json profile.pump.json > newprofile.$RUN_NUMBER.$DATE.json
             profile_pump = os.path.join(autotune_directory, 'profile.pump.json')
             autotune_core = 'oref0-autotune-core {autotune_run} {profile} {profile_pump}'.format(profile=profile, profile_pump = profile_pump, autotune_run=autotune_run_filename)
-            
+
             # newprofile.$RUN_NUMBER.$DATE.json
             newprofile_run_filename = os.path.join(autotune_directory, 'newprofile.{run_number}.{date}.json'
                                                    .format(run_number=run_number, date=date.strftime("%Y-%m-%d")))
@@ -203,7 +211,7 @@ def run_autotune(start_date, end_date, number_of_runs, directory):
                 logging.info('Running {script}'.format(script=autotune_core))
                 call(autotune_core, stdout=output, shell=True)
                 logging.info('Writing output to {filename}'.format(filename=autotune_run_filename))
-        
+
             # Copy tuned profile produced by autotune to profile.json for use with next day of data
             # cp newprofile.$RUN_NUMBER.$DATE.json profile.json
             shutil.copy(os.path.join(autotune_directory, 'newprofile.{run_number}.{date}.json'.format(run_number=run_number, date=date.strftime("%Y-%m-%d"))),

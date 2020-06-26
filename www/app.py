@@ -7,8 +7,7 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     myopenaps_dir = "/root/myopenaps/"
-    data=dict()
-    data['hostname']=socket.gethostname()
+    data = {'hostname': socket.gethostname()}
     glucose = json.load(open(os.path.join(myopenaps_dir, "monitor/glucose.json")))
     data['glucose']=glucose[0]
     # TODO: calculate delta properly when glucose[1] isn't 5m ago

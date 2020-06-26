@@ -106,7 +106,7 @@ while (status!=0):
 	(t, status, output) = gettimestatusoutput(CMD_GET_GLUCOSE % hours)
 	if status==0:
 		break
-	iteration=iteration+1
+	iteration += 1
 	print("Iteration: %d. Sleeping %d seconds" % (iteration, WAIT))
 	time.sleep(WAIT)
 
@@ -133,8 +133,8 @@ sliding24h=j1
 most_recent_cgm=display_time_list[0]
 print("Most recent cgm display time: %s" % most_recent_cgm)
 
-while (True):
-	iteration=iteration+1
+while True:
+	iteration += 1
 	wait=calculate_wait_until_next_cgm(most_recent_cgm)
 	print("Round: %d. Sleeping %d seconds" % (iteration, wait))
 	time.sleep(wait)
@@ -145,13 +145,13 @@ while (True):
 		j2=json.loads(output)
 		for d in j2:
 			dt=d["display_time"]
-			if not (dt in display_time_list):
+			if dt not in display_time_list:
 				print("New: %s" % dt)
 				display_time_list.append(dt)
 				new.append(d)
 				most_recent_cgm=dt
 
-	if len(new)>0: # only do stuff if we have new cgm records
+	if new: # only do stuff if we have new cgm records
 		new=limitlist(new+sliding24h, CGMPER24H) # limit json to 24h of cgm values
 		sliding24h=new
 		f = open(DEST, 'w')
