@@ -69,21 +69,21 @@ def main(args):
         pump_ini=os.path.join(args.dir, args.pump_ini)
         pump_port=get_port_from_pump_ini(pump_ini)
         logging.debug("Serial device (port) for pump is: %s" % pump_port)
-        
+
         # step 2: check if port device file exists. If not reset USB if it's requested with the --resetusb parameter
         if pump_port==PORT_NOT_SET:
            logging.error("port is not set in pump.ini. Please set port to your serial device, e.g. /dev/mmeowlink")
            sys.exit(1)
 
         # step 3: with a TI USB stick the device/symlink can disappear for unknown reasons. Restarting the USB subsystem seems to work
-        tries=0   
+        tries=0
         while (not os.path.exists(pump_port)) and tries<2:
-           logging.error("pump port %s does not exist" % pump_port)
-           if args.ww_ti_usb_reset=='yes':
-               exitcode=execute(["sudo", "oref0-reset-usb"], args.timeout, args.wait)
-               tries=tries+1
-           else: # if not --ww_ti_usb_reset==yes then quit the loop
-             break
+            logging.error("pump port %s does not exist" % pump_port)
+            if args.ww_ti_usb_reset=='yes':
+                exitcode=execute(["sudo", "oref0-reset-usb"], args.timeout, args.wait)
+                tries += 1
+            else: # if not --ww_ti_usb_reset==yes then quit the loop
+                break
 
         # step 4: set environment variable
         os.environ["RFSPY_RTSCTS"]=str(args.rfsypy_rtscts)

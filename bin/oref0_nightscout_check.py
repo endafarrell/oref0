@@ -17,8 +17,7 @@ import time
 nightscout_host=None # will be read from ns.ini
 api_secret=None # will be read from ns.ini
 token_secret=None # will be read from ns.ini
-token_dict={}
-token_dict["exp"]=-1
+token_dict = {"exp": -1}
 auth_headers={}
 
 def init(args):
@@ -48,7 +47,7 @@ def parse_ns_ini(filename):
                         sys.exit(1)
                     nightscout_host=argsline[1]
                     api_secret=argsline[2]
-    if nightscout_host==None:
+    if nightscout_host is None:
         logging.error("Nightscout set not found in %s'"%filename)
         sys.exit(1)
     if not api_secret.startswith('token='):
@@ -102,10 +101,10 @@ def check_permissions():
             if perm not in pg:
               missing.append(perm)
 
-        if len(missing)>0:
-           logging.error("The following permissions are missing in Nightscout: %s" % missing)
-           logging.error("Please follow instructions at https://openaps.readthedocs.io/en/master/docs/walkthrough/phase-1/nightscout-setup.md#switching-from-api_secret-to-token-based-authentication-for-your-rig")
-           sys.exit(1)
+        if missing:
+            logging.error("The following permissions are missing in Nightscout: %s" % missing)
+            logging.error("Please follow instructions at https://openaps.readthedocs.io/en/master/docs/walkthrough/phase-1/nightscout-setup.md#switching-from-api_secret-to-token-based-authentication-for-your-rig")
+            sys.exit(1)
         logging.info("All permissions in Nightscout are ok")
 
 

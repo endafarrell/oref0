@@ -38,7 +38,7 @@ def calc_minutes(timestr):
     # returns the number of minutes from midnight. seconds are ignored
     # based on http://stackoverflow.com/questions/10663720/converting-a-time-string-to-seconds-in-python
     ftr = [60,1,0] # ignore seconds, count minutes, and use 60 minutes per hour
-    return sum([a*b for a,b in zip(ftr, map(int,timestr.split(':')))])
+    return sum(a*b for a,b in zip(ftr, map(int,timestr.split(':'))))
 
 def expandProfile(l, valueField, offsetField):
     r=[]
@@ -71,7 +71,7 @@ def writeExcelHeader(ws, date_format, headerFormat):
         for minutes in [0,30]:
             dt=datetime.datetime.strptime('%02d:%02d' % (hours,minutes) , '%H:%M')
             ws.write_datetime(0, col, dt, date_format)
-            col=col+1
+            col += 1
 
 def write_profile(worksheet, row, json, excel_number_format):
     worksheet.write_string(row, 0, filename)
@@ -83,7 +83,7 @@ def write_profile(worksheet, row, json, excel_number_format):
     for i in PROFILE_FIELDS:
         if json.has_key(i):
            worksheet.write_number(row, col, json[i], excel_number_format)
-        col=col+1
+        col += 1
     
 def write_timebased_profile(worksheet, row, expandedList, excel_number_format):
     worksheet.write_string(row, 0, filename)
@@ -91,9 +91,9 @@ def write_timebased_profile(worksheet, row, expandedList, excel_number_format):
     worksheet.write_string(row, 1, date)
     worksheet.write_string(row, 2, run)
     col=3
-    for i in range(len(expandedList)):
-        worksheet.write_number(row, col, expandedList[i], excel_number_format)
-        col=col+1
+    for item in expandedList:
+        worksheet.write_number(row, col, item, excel_number_format)
+        col += 1
 
 def excel_init_workbook(workbook):
     #see http://xlsxwriter.readthedocs.io/format.html#format for documentation on the Excel format's
@@ -110,28 +110,33 @@ def excel_init_workbook(workbook):
     col=3
     for colName in PROFILE_FIELDS:
         worksheetProfile.write_string(0,col, colName, headerFormat)
-        col=col+1
+        col += 1
 
     worksheetIsf = workbook.add_worksheet('isfProfile')
-    worksheetBasal = workbook.add_worksheet('basalProfile') 
+    worksheetBasal = workbook.add_worksheet('basalProfile')
     writeExcelHeader(worksheetBasal, excel_hour_format,headerFormat)
     writeExcelHeader(worksheetIsf, excel_hour_format,headerFormat)
     worksheetBasal.autofilter('A1:C999')
     worksheetIsf.autofilter('A1:C999')
     worksheetBasal.set_column(3, 50, 6) # set columns starting from 3 to same width
     worksheetIsf.set_column(3, 50, 6) # set columns starting from 3 to same width
-    infoText=['Released under MIT license. See the accompanying LICENSE.txt file for', 'full terms and conditions', '']
-    infoText.append('THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR')
-    infoText.append('IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,')
-    infoText.append('FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE')
-    infoText.append('AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER')
-    infoText.append('LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,')
-    infoText.append('OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN')
-    infoText.append('THE SOFTWARE.')
+    infoText = [
+        'Released under MIT license. See the accompanying LICENSE.txt file for',
+        'full terms and conditions',
+        '',
+        'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR',
+        'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,',
+        'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE',
+        'AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER',
+        'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,',
+        'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN',
+        'THE SOFTWARE.',
+    ]
+
     row=1
-    for i in range(len(infoText)):
-        worksheetInfo.write_string(row, 1, infoText[i])
-        row=row+1
+    for item in infoText:
+        worksheetInfo.write_string(row, 1, item)
+        row += 1
     return (worksheetProfile, worksheetBasal, worksheetIsf, excel_2decimals_format, excel_integer_format)
 
 # sort filenames. First on date and then on run number
